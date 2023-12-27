@@ -11,7 +11,7 @@ class Mealcity {
         this.client.connect().then(() => {
             this.db = this.client.db(database);
         }).catch((err) => {
-            console.log(`An error occured` + err);
+            console.log(`An error occured ` + err);
         });
     }
 
