@@ -1,4 +1,5 @@
 import usercontroller from '../controllers/UserControllers';
+import cartcontroller from '../controllers/CartControllers';
 // import Authcontroller from '../controllers/AuthController';
 import express from 'express';
 
@@ -21,4 +22,13 @@ router.get('/disconnect', (req, res) => {
 router.get('/users/me', (req, res) => {
     usercontroller.getMe(req, res);
 });
+
+router.post('/upload', (req, res) => {
+    cartcontroller.uploadItem(req, res);
+});
+
+router.put('/updatePassword', (req, res) => {
+    usercontroller.updatePassword(req, res);
+});
+
 }

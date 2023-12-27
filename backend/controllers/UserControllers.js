@@ -12,6 +12,7 @@ class UserController {
 
     // A function which checks if a user is registered, if not registers the user and add the user to the database
     async createNew(req, res) {
+      try {
         const email = req.body.email;
         const password = req.body.password;
         const names = req.body.names;
@@ -38,6 +39,10 @@ class UserController {
         if (createUser) {
           return res.status(201).send({ id: createUser.insertedId, email: email });
         }
+      }catch (err) {
+        console.log(err);
+        res.status(500).send({error: 'Server Error'});
+      }
         
     }
 
@@ -63,7 +68,7 @@ class UserController {
         return res.status(200).send({token});
       } catch (err) {
         console.log(`Error ocurred ${err}`);
-        res.status(401).send({error: 'Server Error'});
+        res.status(500).send({error: 'Server Error'});
       }
 
     }
@@ -105,6 +110,33 @@ class UserController {
           return res.status(201).send({id: userId, email: user_id.email});
         
         }
+    }
+
+    async updatePassword(req, res) {
+     try {
+      const { email, currentpassword, newpassword } = req.body;
+      if (!currentpassword && (!newpassword)) {
+        return res.status.send({error: "Password value not inputted"})
+      }
+      const user_mail = await Mealcity.db.collection('users').findOne({ email });
+      if (!user_mail) {
+        return req.status(400).send({error: "Invalid user"});
+      }
+      const chkpass = await bcrypt.compare(currentpassword, user_mail.password);
+      if (!chkpass) {
+        return res.status(400).send({error: "Incorrect password"});
+      }
+      const hash_password = await bcrypt.hash(newpassword, 10);
+      const updatePass = await Mealcity.db.collection('users').updateOne( { email }, { $set: {password: hash_password}} );
+      if (updatePass) {
+        return res.status(200).send({message: "Password has been updated"});
+      } else {
+        return res.status(400).send({error: "Unable to update password"});
+      }
+      }catch (err) {
+        console.log(`An error occurred ${err}`);
+        return res.status(500).send({error: `An error occured on the server side ${err}` });
+      }
     }
 }
 
